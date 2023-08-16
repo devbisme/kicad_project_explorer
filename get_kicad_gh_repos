@@ -1,3 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Gather KiCad projects from Github using their search API and the command-line JSON processor.
+# Supporting documentation:
+#   Github search API: https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#search-repositories
+#   Github search examples: https://gist.github.com/jasonrudolph/6065289
+#   jq JSON processor: https://manpages.ubuntu.com/manpages/xenial/man1/jq.1.html
+
+# Search term for KiCad projects.
+search_term="kicad"
+
 # File for storing KiCad Github repositories.
 kicad_repos="kicad_repos.json"
 
@@ -14,7 +26,7 @@ tmpfile=$(mktemp)
 page_size=100
 
 # Search for repos year-by-year.
-for y in {2012..2012}
+for y in {2012..2023}
 do
 
     # Search for repos in each month of the year. This keeps #repos < 1000 (Github search API limit). 
@@ -34,7 +46,7 @@ do
 
             # Search Github for the year-month and process the page of results.
             curl -G https://api.github.com/search/repositories \
-                --data-urlencode "q=kicad in:readme created:$created_on" \
+                --data-urlencode "q=$search_term in:readme created:$created_on" \
                 --data-urlencode "per_page=$page_size" \
                 --data-urlencode "page=$pg" \
                 --data-urlencode "sort=updated" \
@@ -44,7 +56,6 @@ do
                     [ \
                         .items[] | \
                         { \
-                            proj_id: .id, \
                             name, \
                             description, \
                             owner:.owner.login, \
@@ -53,7 +64,8 @@ do
                             forks:.forks_count, \
                             created:.created_at, \
                             updated:.updated_at, \
-                            url:.html_url \
+                            url:.html_url, \
+                            id \
                         } \
                     ]" > $pagefile
 
@@ -72,3 +84,7 @@ do
         done  # Page done.
     done  # Month done.
 done  # Year done.
+
+# Remove duplicate projects. (Dups could be caused by rerunning this script with overlapping search dates.)
+cp $kicad_repos $tmpfile
+cat $tmpfile | jq 'unique' > $kicad_repos
