@@ -19,7 +19,7 @@ if [ ! -e $kicad_repos ] || [ ! -s $kicad_repos ]; then
 fi
 
 # Temporary files for search results.
-pagefile=$(mktemp)
+page_repos=$(mktemp)
 tmpfile=$(mktemp)
 
 # Number of results per page returned by Github search API.
@@ -67,17 +67,19 @@ do
                             url:.html_url, \
                             id \
                         } \
-                    ]" > $pagefile
+                    ]" > $page_repos
 
             # Observe rate-limit of Github search (10 searches / minute)
             sleep 6s
 
             # Get the number of projects on the current page of results.
-            num_projs_on_page=`cat $pagefile | jq ".|length"`
+            num_projs_on_page=`cat $page_repos | jq ".|length"`
 
             if (( $num_projs_on_page != 0 )); then
                 # Append page results to the end of the KiCad repos JSON file.
-                (echo '['; cat $kicad_repos; echo ','; cat $pagefile; echo ']') > $tmpfile
+                # Create an array containing two subarrays: [ [KiCad repos], [page repos] ]
+                (echo '['; cat $kicad_repos; echo ','; cat $page_repos; echo ']') > $tmpfile
+                # Now merge the two subarrays into a single array.
                 cat $tmpfile | jq ".[0]+.[1]" > $kicad_repos
             fi
 
