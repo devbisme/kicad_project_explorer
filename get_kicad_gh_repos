@@ -1,0 +1,74 @@
+# File for storing KiCad Github repositories.
+kicad_repos="kicad_repos.json"
+
+# If file doesn't exist or is empty, then make a file with an empty array of repository data.
+if [ ! -e $kicad_repos ] || [ ! -s $kicad_repos ]; then
+    echo '[]' > $kicad_repos
+fi
+
+# Temporary files for search results.
+pagefile=$(mktemp)
+tmpfile=$(mktemp)
+
+# Number of results per page returned by Github search API.
+page_size=100
+
+# Search for repos year-by-year.
+for y in {2012..2012}
+do
+
+    # Search for repos in each month of the year. This keeps #repos < 1000 (Github search API limit). 
+    for m in {01..12}
+    do
+
+        # Clear the screen and report progress.
+        echo "Gathering KiCad projects for $y/$m ..."
+
+        # Search for repos created in this month-year.
+        created_on="${y}-${m}"
+
+        # Scan through each page of search results until a non-full page appears.
+        num_projs_on_page=$page_size
+        for (( pg=1; num_projs_on_page==page_size; pg+=1 ))
+        do
+
+            # Search Github for the year-month and process the page of results.
+            curl -G https://api.github.com/search/repositories \
+                --data-urlencode "q=kicad in:readme created:$created_on" \
+                --data-urlencode "per_page=$page_size" \
+                --data-urlencode "page=$pg" \
+                --data-urlencode "sort=updated" \
+                -H "Accept: application/vnd.github+json" \
+                2>/dev/null \
+                | jq "
+                    [ \
+                        .items[] | \
+                        { \
+                            proj_id: .id, \
+                            name, \
+                            description, \
+                            owner:.owner.login, \
+                            size, \
+                            stars:.stargazers_count, \
+                            forks:.forks_count, \
+                            created:.created_at, \
+                            updated:.updated_at, \
+                            url:.html_url \
+                        } \
+                    ]" > $pagefile
+
+            # Observe rate-limit of Github search (10 searches / minute)
+            sleep 6s
+
+            # Get the number of projects on the current page of results.
+            num_projs_on_page=`cat $pagefile | jq ".|length"`
+
+            if (( $num_projs_on_page != 0 )); then
+                # Append page results to the end of the KiCad repos JSON file.
+                (echo '['; cat $kicad_repos; echo ','; cat $pagefile; echo ']') > $tmpfile
+                cat $tmpfile | jq ".[0]+.[1]" > $kicad_repos
+            fi
+
+        done  # Page done.
+    done  # Month done.
+done  # Year done.
