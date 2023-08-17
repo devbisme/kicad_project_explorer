@@ -3,7 +3,7 @@ let sortDirection = {};
 
 window.onload = function() {
     // fetch('https://example.com/data.json')
-    fetch('/kicad_repos.json')
+    fetch('/kicad_repos_small.json')
         .then(response => response.json())
         .then(data => {
             jsonData = data;
@@ -54,13 +54,14 @@ function populateTable(data) {
     keys.forEach(key => {
         let th = document.createElement('th');
         th.onclick = function() { sortTable(key); };
+
+        th.className = "draggable";
         
         let div = document.createElement('div');
-        // div.className = 'cell';
-        div.className = 'cell.' + key;
+        div.className = 'cell';
         // div.textContent = key + (sortDirection[key] === 'asc' ? ' ▲' : ' ▼');
         // div.textContent = key + (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
-        div.innerHTML = key + (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
+        div.innerHTML = key + "<br>" + (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
         
         th.appendChild(div);
         headerRow.appendChild(th);
@@ -88,6 +89,18 @@ function populateTable(data) {
 
     table.appendChild(thead);
     table.appendChild(tbody);
+
+    $("thead th").resizable({
+        handles: "e",
+        minWidth: 50,
+        resize: function(event, ui) {
+            var index = ui.helper.index();
+            $('tbody tr').each(function() {
+                $(this).children().eq(index).width(ui.size.width);
+            });
+        }
+    });
+
 }
 
 function sortTable(column) {

@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Single Page Application</title>
+    <title>KiCad Project Table</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h2>JSON Data Table</h2>
+    <h2>KiCad Project Table</h2>
     <input type="text" id="filterField" placeholder="Column:Value">
     <button onclick="filterTable()">Filter</button>
     <div class="table-container">
         <table id="dataTable">
             <thead></thead>
-            <tbody></tbody>
+            <tbody class=""scrollable-body></tbody>
         </table>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="app.js"></script>
-</body>
 </html>

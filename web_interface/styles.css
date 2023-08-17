@@ -1,25 +1,25 @@
+h2 {
+    font-family: Arial, sans-serif, Helvetica, sans-serif;
+}
+
 table {
-    table-layout: fixed;
-    border-collapse: collapse;
+    /* table-layout: fixed; */
+    /* border-collapse: collapse; */
     width: 100%;
+    font-family: Arial, sans-serif, Helvetica, sans-serif;
 }
 
-div.cell {
-    /* width: 10%; */
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.table-container {
+    height: calc(100vh - 100px);
+    overflow: auto;
 }
 
-div.stars {
-    width: 30px;
+div.stars, div.forks, div.size {
     text-align: right;
 }
 
 th, td {
     padding: 8px;
-    /* text-align: left; */
     border-bottom: 1px solid #ddd;
 }
 
@@ -34,14 +34,9 @@ th {
 }
 
 .even-row {
-    background-color: #9ee0ef;
+    background-color: #c3e3fd;
 }
 
 tr:hover {
-    background-color: #FFA07A;
-}
-
-.table-container {
-    height: 800px;
-    overflow: auto;
+    background-color: #f8c668;
 }
