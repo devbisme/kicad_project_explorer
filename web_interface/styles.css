@@ -2,17 +2,27 @@ h2 {
     font-family: Arial, sans-serif, Helvetica, sans-serif;
 }
 
-table {
-    /* table-layout: fixed; */
-    /* border-collapse: collapse; */
-    width: 100%;
-    font-family: Arial, sans-serif, Helvetica, sans-serif;
-}
+
 
 .table-container {
-    height: calc(100vh - 100px);
     overflow: auto;
+    max-height: calc(100vh - 100px);
 }
+
+#dataTable {
+    width: 100%;
+    /* table-layout: fixed; */
+    table-layout: auto;
+}
+
+#dataTable thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+
 
 div.stars, div.forks, div.size {
     text-align: right;

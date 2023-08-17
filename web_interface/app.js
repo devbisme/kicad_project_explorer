@@ -11,38 +11,6 @@ window.onload = function() {
         });
 }
 
-// function populateTable(data) {
-//     const table = document.getElementById('dataTable');
-//     table.innerHTML = '';
-//     let thead = document.createElement('thead');
-//     let tbody = document.createElement('tbody');
-
-//     let keys = Object.keys(data[0]);
-//     let headerRow = document.createElement('tr');
-//     keys.forEach(key => {
-//         let th = document.createElement('th');
-//         th.onclick = function() { sortTable(key); };
-//         th.textContent = key;
-//         th.innerHTML += sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;';
-//         headerRow.appendChild(th);
-//     });
-//     thead.appendChild(headerRow);
-
-//     data.forEach((object, index) => {
-//         let tr = document.createElement('tr');
-//         tr.className = index % 2 === 0 ? 'even-row' : 'odd-row';
-//         keys.forEach(key => {
-//             let td = document.createElement('td');
-//             td.textContent = object[key];
-//             tr.appendChild(td);
-//         });
-//         tbody.appendChild(tr);
-//     });
-
-//     table.appendChild(thead);
-//     table.appendChild(tbody);
-// }
-
 function populateTable(data) {
     const table = document.getElementById('dataTable');
     table.innerHTML = '';
@@ -55,7 +23,7 @@ function populateTable(data) {
         let th = document.createElement('th');
         th.onclick = function() { sortTable(key); };
 
-        th.className = "draggable";
+        th.className = "resizable";
         
         let div = document.createElement('div');
         div.className = 'cell';
@@ -90,17 +58,15 @@ function populateTable(data) {
     table.appendChild(thead);
     table.appendChild(tbody);
 
-    $("thead th").resizable({
+    $("th.resizable").resizable({
         handles: "e",
         minWidth: 50,
+        alsoResize: "#dataTable",
         resize: function(event, ui) {
-            var index = ui.helper.index();
-            $('tbody tr').each(function() {
-                $(this).children().eq(index).width(ui.size.width);
-            });
+            var index = ui.helper.index() + 1;
+            $("td:nth-child(" + index + ")").width(ui.size.width);
         }
     });
-
 }
 
 function sortTable(column) {
