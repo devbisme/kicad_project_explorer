@@ -1,0 +1,47 @@
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+div.cell {
+    /* width: 10%; */
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+div.stars {
+    width: 30px;
+    text-align: right;
+}
+
+th, td {
+    padding: 8px;
+    /* text-align: left; */
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+}
+
+.odd-row {
+    background-color: #f2f2f2;
+}
+
+.even-row {
+    background-color: #9ee0ef;
+}
+
+tr:hover {
+    background-color: #FFA07A;
+}
+
+.table-container {
+    height: 800px;
+    overflow: auto;
+}
