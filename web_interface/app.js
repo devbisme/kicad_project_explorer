@@ -21,16 +21,19 @@ function populateTable(data) {
     let headerRow = document.createElement('tr');
     keys.forEach(key => {
         let th = document.createElement('th');
-        th.onclick = function() { sortTable(key); };
-
         th.className = "resizable";
         
         let div = document.createElement('div');
-        div.className = 'cell';
-        // div.textContent = key + (sortDirection[key] === 'asc' ? ' ▲' : ' ▼');
-        // div.textContent = key + (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
-        div.innerHTML = key + "<br>" + (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
-        
+        div.className = 'head_cell';
+        let div_key = document.createElement('div');
+        div_key.textContent = key + " ";
+        let div_updwn = document.createElement('div');
+        div_updwn.className = "sort-button";
+        div_updwn.innerHTML = (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
+        div_updwn.onclick = function() { sortTable(key); }
+
+        div.appendChild(div_key);
+        div.appendChild(div_updwn);
         th.appendChild(div);
         headerRow.appendChild(th);
     });
@@ -43,12 +46,12 @@ function populateTable(data) {
             let td = document.createElement('td');
             
             let div = document.createElement('div');
-            div.className = 'cell';
-            let div2 = document.createElement('div');
-            div2.className = key;
-            div2.textContent = object[key];
+            div.className = 'data_cell';
+            let div_key = document.createElement('div');
+            div_key.className = key;
+            div_key.textContent = object[key];
             
-            div.appendChild(div2)
+            div.appendChild(div_key)
             td.appendChild(div);
             tr.appendChild(td);
         });

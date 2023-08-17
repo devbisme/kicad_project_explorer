@@ -10,12 +10,14 @@ h2 {
 }
 
 #dataTable {
+    font-family: Arial, sans-serif, Helvetica, sans-serif;
     width: 100%;
     /* table-layout: fixed; */
     table-layout: auto;
 }
 
 #dataTable thead {
+    font-family: Arial, sans-serif, Helvetica, sans-serif;
     position: sticky;
     top: 0;
     background: white;
@@ -49,4 +51,8 @@ th {
 
 tr:hover {
     background-color: #f8c668;
+}
+
+div.sort-button:hover {
+    cursor: pointer;
 }
