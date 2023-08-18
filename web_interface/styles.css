@@ -2,8 +2,6 @@ h2 {
     font-family: Arial, sans-serif, Helvetica, sans-serif;
 }
 
-
-
 .table-container {
     overflow: auto;
     max-height: calc(100vh - 100px);
@@ -12,8 +10,7 @@ h2 {
 #dataTable {
     font-family: Arial, sans-serif, Helvetica, sans-serif;
     width: 100%;
-    /* table-layout: fixed; */
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 #dataTable thead {
@@ -24,10 +21,12 @@ h2 {
     z-index: 10;
 }
 
-
-
 .stars, .forks, .size {
     text-align: right;
+}
+
+.created {
+    text-align: center;
 }
 
 th, td {
@@ -39,6 +38,32 @@ th {
     background-color: #f2f2f2;
     position: sticky;
     top: 0;
+}
+
+.column-key, .sort-button {
+    display: inline-block;
+}
+
+#name {
+    width: 10%;
+}
+#description {
+    width: 30%;
+}
+#owner {
+    width: 10%;
+}
+#stars {
+    width: 5%;
+}
+#forks {
+    width: 5%;
+}
+#size {
+    width: 5%;
+}
+#created {
+    width: 10%;
 }
 
 .odd-row {

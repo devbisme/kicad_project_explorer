@@ -56,20 +56,22 @@ function populateTable(data) {
     let headerRow = document.createElement('tr');
     keys.forEach(key => {
         let th = document.createElement('th');
-        th.className = "resizable";
+        th.setAttribute("id", key);
         
-        let div = document.createElement('div');
-        div.className = 'head_cell';
         let div_key = document.createElement('div');
-        div_key.textContent = key + " ";
-        let div_updwn = document.createElement('div');
-        div_updwn.className = "sort-button";
-        div_updwn.innerHTML = (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
-        div_updwn.onclick = function() { sortTable(key); }
+        // div_key.textContent = key + " ";
+        div_key.innerHTML = key + '&nbsp;';
+        div_key.className = "column-key";
+        th.appendChild(div_key);
 
-        div.appendChild(div_key);
-        div.appendChild(div_updwn);
-        th.appendChild(div);
+        if (! ['name', 'description'].includes(key)) {
+            let div_updwn = document.createElement('div');
+            div_updwn.className = "sort-button";
+            div_updwn.innerHTML = (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
+            div_updwn.onclick = function() { sortTable(key); }
+            th.appendChild(div_updwn);
+        }
+
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -88,16 +90,6 @@ function populateTable(data) {
 
     table.appendChild(thead);
     table.appendChild(tbody);
-
-    $("th.resizable").resizable({
-        handles: "e",
-        minWidth: 50,
-        alsoResize: "#dataTable",
-        resize: function(event, ui) {
-            var index = ui.helper.index() + 1;
-            $("td:nth-child(" + index + ")").width(ui.size.width);
-        }
-    });
 }
 
 function sortTable(column) {
