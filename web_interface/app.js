@@ -3,12 +3,47 @@ let sortDirection = {};
 
 window.onload = function() {
     // fetch('https://example.com/data.json')
-    fetch('/kicad_repos_small.json')
+    // fetch('/kicad_repos_small.json')
+    fetch('/kicad_repos.json')
         .then(response => response.json())
         .then(data => {
+            preprocessData(data);
             jsonData = data;
             populateTable(data);
         });
+}
+
+function preprocessData(data) {
+    keys = Object.keys(data[0])
+    data.forEach((object, index) => {
+        keys.forEach(key => {
+            switch (key) {
+
+                case 'name':
+                    object[key] = `<a href="${object["url"]}" target="_blank">${object[key]}</a>`;
+                    console.log(object[key]);
+                    break;
+
+                case 'created':
+                    date = object[key];
+                    object[key] = date.split("T")[0];
+                    break;
+            
+                case 'updated':
+                    date = object[key];
+                    object[key] = date.split("T")[0];
+                    break;
+            
+                default:
+                    break;
+            }
+        })
+
+        // Remove this data so it isn't displayed.
+        delete object.url;
+        delete object.id;
+        delete object.updated;
+    })
 }
 
 function populateTable(data) {
@@ -49,7 +84,7 @@ function populateTable(data) {
             div.className = 'data_cell';
             let div_key = document.createElement('div');
             div_key.className = key;
-            div_key.textContent = object[key];
+            div_key.innerHTML = object[key];
             
             div.appendChild(div_key)
             td.appendChild(div);
