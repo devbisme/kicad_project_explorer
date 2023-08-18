@@ -21,12 +21,26 @@ h2 {
     z-index: 10;
 }
 
+.name {
+    width: 20%;
+}
+
+.description {
+    width: 45%;
+}
+
+.owner {
+    width: 10%;
+}
+
 .stars, .forks, .size {
     text-align: right;
+    width: 5%;
 }
 
 .created {
     text-align: center;
+    width: 10%;
 }
 
 th, td {
@@ -42,28 +56,6 @@ th {
 
 .column-key, .sort-button {
     display: inline-block;
-}
-
-#name {
-    width: 10%;
-}
-#description {
-    width: 30%;
-}
-#owner {
-    width: 10%;
-}
-#stars {
-    width: 5%;
-}
-#forks {
-    width: 5%;
-}
-#size {
-    width: 5%;
-}
-#created {
-    width: 10%;
 }
 
 .odd-row {

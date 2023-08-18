@@ -49,21 +49,20 @@ function preprocessData(data) {
 function populateTable(data) {
     const table = document.getElementById('dataTable');
     table.innerHTML = '';
-    let thead = document.createElement('thead');
-    let tbody = document.createElement('tbody');
 
     let keys = Object.keys(data[0]);
+    
+    let thead = document.createElement('thead');
     let headerRow = document.createElement('tr');
     keys.forEach(key => {
         let th = document.createElement('th');
-        th.setAttribute("id", key);
+        th.classList.add(key);
         
         let div_key = document.createElement('div');
-        // div_key.textContent = key + " ";
         div_key.innerHTML = key + '&nbsp;';
         div_key.className = "column-key";
         th.appendChild(div_key);
-
+        
         if (! ['name', 'description'].includes(key)) {
             let div_updwn = document.createElement('div');
             div_updwn.className = "sort-button";
@@ -71,11 +70,13 @@ function populateTable(data) {
             div_updwn.onclick = function() { sortTable(key); }
             th.appendChild(div_updwn);
         }
-
+        
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
-
+    table.appendChild(thead);
+    
+    let tbody = document.createElement('tbody');
     data.forEach((object, index) => {
         let tr = document.createElement('tr');
         tr.className = index % 2 === 0 ? 'even-row' : 'odd-row';
@@ -87,8 +88,6 @@ function populateTable(data) {
         });
         tbody.appendChild(tr);
     });
-
-    table.appendChild(thead);
     table.appendChild(tbody);
 }
 
