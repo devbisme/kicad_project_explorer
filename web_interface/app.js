@@ -79,15 +79,8 @@ function populateTable(data) {
         tr.className = index % 2 === 0 ? 'even-row' : 'odd-row';
         keys.forEach(key => {
             let td = document.createElement('td');
-            
-            let div = document.createElement('div');
-            div.className = 'data_cell';
-            let div_key = document.createElement('div');
-            div_key.className = key;
-            div_key.innerHTML = object[key];
-            
-            div.appendChild(div_key)
-            td.appendChild(div);
+            td.innerHTML = object[key];
+            td.classList.add(key);
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
