@@ -21,15 +21,16 @@ function preprocessData(data) {
 
                 case 'name':
                     object[key] = `<a href="${object["url"]}" target="_blank">${object[key]}</a>`;
-                    console.log(object[key]);
                     break;
 
                 case 'created':
+                    // Split off the time; only keep the Y/M/D.
                     date = object[key];
                     object[key] = date.split("T")[0];
                     break;
             
                 case 'updated':
+                    // Split off the time; only keep the Y/M/D.
                     date = object[key];
                     object[key] = date.split("T")[0];
                     break;
@@ -47,9 +48,10 @@ function preprocessData(data) {
 }
 
 function populateTable(data) {
+    
     const table = document.getElementById('dataTable');
     table.innerHTML = '';
-
+    
     let keys = Object.keys(data[0]);
     
     let thead = document.createElement('thead');
@@ -78,17 +80,33 @@ function populateTable(data) {
     
     let tbody = document.createElement('tbody');
     data.forEach((object, index) => {
-        let tr = document.createElement('tr');
-        tr.className = index % 2 === 0 ? 'even-row' : 'odd-row';
-        keys.forEach(key => {
-            let td = document.createElement('td');
-            td.innerHTML = object[key];
-            td.classList.add(key);
-            tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
+            let tr = document.createElement('tr');
+            tr.className = index % 2 === 0 ? 'even-row' : 'odd-row';
+            keys.forEach(key => {
+                let td = document.createElement('td');
+                td.innerHTML = object[key];
+                td.classList.add(key);
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
     });
+    updateProgressBar(100);
     table.appendChild(tbody);
+}
+
+function updateProgressBar(progress) {
+    if (progress<100) {
+        console.log("updateProgressBar");
+        $( "#progressbar" ).show();
+        $( "#progressbar" ).progressbar( "option", "value", progress );
+    }
+    else {
+        $( "#progressbar" ).hide();
+    }
+}
+
+function startProgress(){
+    updateProgressBar(0);
 }
 
 function sortTable(column) {
@@ -104,3 +122,7 @@ function filterTable() {
     let filteredData = jsonData.filter(item => item[filter[0]].includes(filter[1]));
     populateTable(filteredData);
 }
+
+$( "#progressbar" ).progressbar({
+    value: false
+});

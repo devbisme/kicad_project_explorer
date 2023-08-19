@@ -2,6 +2,14 @@ h2 {
     font-family: Arial, sans-serif, Helvetica, sans-serif;
 }
 
+#progressbar {
+    width: 30%;
+    height: 15px;
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    display: inline-block;
+}
+
 .table-container {
     overflow: auto;
     max-height: calc(100vh - 100px);
@@ -23,6 +31,9 @@ h2 {
 
 .name {
     width: 20%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;    
 }
 
 .description {
@@ -30,6 +41,9 @@ h2 {
 }
 
 .owner {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;    
     width: 10%;
 }
 
@@ -63,7 +77,7 @@ th {
 }
 
 .even-row {
-    background-color: #c3e3fd;
+    background-color: #a5d7fe;
 }
 
 tr:hover {
