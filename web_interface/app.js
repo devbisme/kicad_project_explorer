@@ -1,7 +1,7 @@
 let jsonData = [];
 let sortDirection = {};
 
-window.onload = function() {
+window.onload = function () {
     // fetch('https://example.com/data.json')
     // fetch('/kicad_repos_small.json')
     fetch('/kicad_repos.json')
@@ -9,8 +9,7 @@ window.onload = function() {
         .then(data => {
             preprocessData(data);
             jsonData = data;
-            sortTable("created");
-            // populateTable(data);
+            sortTableDesc("created"); // Start off with projects sorted by creation date, newest at top.
         });
 }
 
@@ -29,13 +28,13 @@ function preprocessData(data) {
                     date = object[column];
                     object[column] = date.split("T")[0];
                     break;
-            
+
                 case 'updated':
                     // Split off the time; only keep the Y/M/D.
                     date = object[column];
                     object[column] = date.split("T")[0];
                     break;
-            
+
                 default:
                     break;
             }
@@ -49,14 +48,14 @@ function preprocessData(data) {
 }
 
 function populateTable(data) {
-    
+
     // Creat empty table.
     const table = document.getElementById('dataTable');
     table.innerHTML = '';
-    
+
     // One table column for each field of a row of data.
     let columns = Object.keys(data[0]);
-    
+
     // Create header for the table.
     let headerRow = document.createElement('tr');
     columns.forEach(column => {
@@ -64,22 +63,22 @@ function populateTable(data) {
         // Create header for a column of the table.
         let th = document.createElement('th');
         th.classList.add(column);
-        
+
         // Add a div to hold the text of the column header.
         let div_column = document.createElement('div');
         div_column.innerHTML = column;
         div_column.className = "column";
         th.appendChild(div_column);
-        
+
         // Add sorting buttons to every column except the project name and description.
-        if (! ['name', 'description'].includes(column)) {
+        if (!['name', 'description'].includes(column)) {
             let div_updwn = document.createElement('div');
             div_updwn.className = "sort-button";
-            div_updwn.innerHTML = '&nbsp;' + (sortDirection[column] === 'asc' ? ' &#9650;' : ' &#9660;');
-            div_updwn.onclick = function() { sortTable(column); }
+            div_updwn.innerHTML = '&nbsp;' + (sortDirection[column] === 'asc' ? '&#9650;' : '&#9660;');
+            div_updwn.onclick = function () { sortTable(column); }
             th.appendChild(div_updwn);
         }
-        
+
         headerRow.appendChild(th);
     });
 
@@ -87,15 +86,15 @@ function populateTable(data) {
     let thead = document.createElement('thead');
     thead.appendChild(headerRow);
     table.appendChild(thead);
-    
+
     // Create rows of data for the table.
     let tbody = document.createElement('tbody');
     let show_table = true;
     let idx = 0;
 
     // Function to add table rows in sections and allow progress bar to update.
-    function dataRows(){
-        while(idx < data.length){
+    function dataRows() {
+        while (idx < data.length) {
 
             // Create a row of data.
             let tr = document.createElement('tr');
@@ -109,7 +108,7 @@ function populateTable(data) {
             });
             tbody.appendChild(tr);
 
-            if (idx % 1000 === 0){
+            if (idx % 1000 === 0) {
                 // This set of data rows is done, so process the next set.
                 updateProgressBar((100 * idx) / data.length);
                 setTimeout(dataRows, 0); // Set up to process next set of data upon return.
@@ -117,7 +116,7 @@ function populateTable(data) {
             }
         }
 
-        if( show_table ){
+        if (show_table) {
             // Display an indeterminate progress bar while body is added to table.
             updateProgressBar(false); // indeterminate progress bar.
             show_table = false; // Don't come back here.
@@ -134,24 +133,35 @@ function populateTable(data) {
 
 function updateProgressBar(progress) {
     bar = $("#progressbar");
-    if (progress<100) {
+    if (progress < 100) {
         bar.show();
-        bar.progressbar( "option", "value", progress );
+        bar.progressbar("option", "value", progress);
     }
     else {
         bar.hide();
     }
 }
 
-$( "#progressbar" ).progressbar({
+$("#progressbar").progressbar({
     value: false
 });
 
 function sortTable(column) {
+    if (sortDirection[column] === 'asc')
+        sortTableAsc(column);
+    else
+        sortTableDesc(column);
+}
+
+function sortTableAsc(column) {
     let sortedData = [...jsonData];
-    sortDirection[column] = sortDirection[column] === 'asc' ? 'desc' : 'asc';
     sortedData.sort((a, b) => (a[column] > b[column]) ? 1 : -1);
-    if (sortDirection[column] === 'desc') sortedData.reverse();
+    populateTable(sortedData);
+}
+
+function sortTableDesc(column) {
+    let sortedData = [...jsonData];
+    sortedData.sort((a, b) => (a[column] < b[column]) ? 1 : -1);
     populateTable(sortedData);
 }
 
