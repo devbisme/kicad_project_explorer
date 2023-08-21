@@ -5,9 +5,14 @@ h2 {
 #progressbar {
     width: 30%;
     height: 15px;
-    background-color: #f1f1f1;
+    background: #808080;
+    border-color: #808080;
     border-radius: 20px;
     display: inline-block;
+}
+
+#progressbar > div {
+    background: #a5d7fe;
 }
 
 .table-container {
@@ -68,7 +73,7 @@ th {
     top: 0;
 }
 
-.column-key, .sort-button {
+.column, .sort-button {
     display: inline-block;
 }
 

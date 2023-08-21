@@ -14,25 +14,25 @@ window.onload = function() {
 }
 
 function preprocessData(data) {
-    keys = Object.keys(data[0])
-    data.forEach((object, index) => {
-        keys.forEach(key => {
-            switch (key) {
+    columns = Object.keys(data[0])
+    data.forEach((object, idx) => {
+        columns.forEach(column => {
+            switch (column) {
 
                 case 'name':
-                    object[key] = `<a href="${object["url"]}" target="_blank">${object[key]}</a>`;
+                    object[column] = `<a href="${object["url"]}" target="_blank">${object[column]}</a>`;
                     break;
 
                 case 'created':
                     // Split off the time; only keep the Y/M/D.
-                    date = object[key];
-                    object[key] = date.split("T")[0];
+                    date = object[column];
+                    object[column] = date.split("T")[0];
                     break;
             
                 case 'updated':
                     // Split off the time; only keep the Y/M/D.
-                    date = object[key];
-                    object[key] = date.split("T")[0];
+                    date = object[column];
+                    object[column] = date.split("T")[0];
                     break;
             
                 default:
@@ -52,56 +52,75 @@ function populateTable(data) {
     const table = document.getElementById('dataTable');
     table.innerHTML = '';
     
-    let keys = Object.keys(data[0]);
+    let columns = Object.keys(data[0]);
     
-    let thead = document.createElement('thead');
     let headerRow = document.createElement('tr');
-    keys.forEach(key => {
+    columns.forEach(column => {
         let th = document.createElement('th');
-        th.classList.add(key);
+        th.classList.add(column);
         
-        let div_key = document.createElement('div');
-        div_key.innerHTML = key + '&nbsp;';
-        div_key.className = "column-key";
-        th.appendChild(div_key);
+        let div_column = document.createElement('div');
+        div_column.innerHTML = column;
+        div_column.className = "column";
+        th.appendChild(div_column);
         
-        if (! ['name', 'description'].includes(key)) {
+        // Add sorting buttons to every column except the project name and description.
+        if (! ['name', 'description'].includes(column)) {
             let div_updwn = document.createElement('div');
             div_updwn.className = "sort-button";
-            div_updwn.innerHTML = (sortDirection[key] === 'asc' ? ' &#9650;' : ' &#9660;');
-            div_updwn.onclick = function() { sortTable(key); }
+            div_updwn.innerHTML = '&nbsp;' + (sortDirection[column] === 'asc' ? ' &#9650;' : ' &#9660;');
+            div_updwn.onclick = function() { sortTable(column); }
             th.appendChild(div_updwn);
         }
         
         headerRow.appendChild(th);
     });
+    let thead = document.createElement('thead');
     thead.appendChild(headerRow);
     table.appendChild(thead);
     
     let tbody = document.createElement('tbody');
-    data.forEach((object, index) => {
+    let data_len = data.length;
+    let idx = 0;
+    function dataRows(){
+        while(idx < data_len){
             let tr = document.createElement('tr');
-            tr.className = index % 2 === 0 ? 'even-row' : 'odd-row';
-            keys.forEach(key => {
+            tr.className = idx % 2 === 0 ? 'even-row' : 'odd-row';
+            object = data[idx];
+            columns.forEach(column => {
                 let td = document.createElement('td');
-                td.innerHTML = object[key];
-                td.classList.add(key);
+                td.innerHTML = object[column];
+                td.classList.add(column);
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);
-    });
-    updateProgressBar(100);
-    table.appendChild(tbody);
+            idx++;
+            if (idx % 1000 === 0){
+                // This set of data rows is done, so process the next set.
+                updateProgressBar((100 * idx) / data_len);
+                // Use setTimeout to allow the progress bar to update.
+                setTimeout(dataRows, 0);
+                return;
+            }
+        }
+
+        // Add the body to the table. This will take a while (multiple seconds)!
+        table.appendChild(tbody);
+        updateProgressBar(100);
+    }
+    dataRows();
 }
 
 function updateProgressBar(progress) {
+    bar = $("#progressbar");
+    pct = $("#progressPct");
     if (progress<100) {
-        console.log("updateProgressBar");
-        $( "#progressbar" ).show();
-        $( "#progressbar" ).progressbar( "option", "value", progress );
+        bar.show();
+        pct.innerHTML = "prog";
+        bar.progressbar( "option", "value", progress );
     }
     else {
-        $( "#progressbar" ).hide();
+        bar.hide();
     }
 }
 
