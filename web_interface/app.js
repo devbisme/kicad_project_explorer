@@ -9,7 +9,8 @@ window.onload = function() {
         .then(data => {
             preprocessData(data);
             jsonData = data;
-            populateTable(data);
+            sortTable("created");
+            // populateTable(data);
         });
 }
 
@@ -49,16 +50,22 @@ function preprocessData(data) {
 
 function populateTable(data) {
     
+    // Creat empty table.
     const table = document.getElementById('dataTable');
     table.innerHTML = '';
     
+    // One table column for each field of a row of data.
     let columns = Object.keys(data[0]);
     
+    // Create header for the table.
     let headerRow = document.createElement('tr');
     columns.forEach(column => {
+
+        // Create header for a column of the table.
         let th = document.createElement('th');
         th.classList.add(column);
         
+        // Add a div to hold the text of the column header.
         let div_column = document.createElement('div');
         div_column.innerHTML = column;
         div_column.className = "column";
@@ -75,18 +82,25 @@ function populateTable(data) {
         
         headerRow.appendChild(th);
     });
+
+    // Add the header row to the table.
     let thead = document.createElement('thead');
     thead.appendChild(headerRow);
     table.appendChild(thead);
     
+    // Create rows of data for the table.
     let tbody = document.createElement('tbody');
-    let data_len = data.length;
+    let show_table = true;
     let idx = 0;
+
+    // Function to add table rows in sections and allow progress bar to update.
     function dataRows(){
-        while(idx < data_len){
+        while(idx < data.length){
+
+            // Create a row of data.
             let tr = document.createElement('tr');
             tr.className = idx % 2 === 0 ? 'even-row' : 'odd-row';
-            object = data[idx];
+            object = data[idx++]; // Get data and inc index to next row.
             columns.forEach(column => {
                 let td = document.createElement('td');
                 td.innerHTML = object[column];
@@ -94,14 +108,21 @@ function populateTable(data) {
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);
-            idx++;
+
             if (idx % 1000 === 0){
                 // This set of data rows is done, so process the next set.
-                updateProgressBar((100 * idx) / data_len);
-                // Use setTimeout to allow the progress bar to update.
-                setTimeout(dataRows, 0);
-                return;
+                updateProgressBar((100 * idx) / data.length);
+                setTimeout(dataRows, 0); // Set up to process next set of data upon return.
+                return; // Leave func so progress bar updates.
             }
+        }
+
+        if( show_table ){
+            // Display an indeterminate progress bar while body is added to table.
+            updateProgressBar(false); // indeterminate progress bar.
+            show_table = false; // Don't come back here.
+            setTimeout(dataRows, 0); // When we exit, set up to come back to the next phase.
+            return; // Leave func so progress bar updates.
         }
 
         // Add the body to the table. This will take a while (multiple seconds)!
@@ -113,10 +134,8 @@ function populateTable(data) {
 
 function updateProgressBar(progress) {
     bar = $("#progressbar");
-    pct = $("#progressPct");
     if (progress<100) {
         bar.show();
-        pct.innerHTML = "prog";
         bar.progressbar( "option", "value", progress );
     }
     else {
@@ -124,9 +143,9 @@ function updateProgressBar(progress) {
     }
 }
 
-function startProgress(){
-    updateProgressBar(0);
-}
+$( "#progressbar" ).progressbar({
+    value: false
+});
 
 function sortTable(column) {
     let sortedData = [...jsonData];
@@ -141,7 +160,3 @@ function filterTable() {
     let filteredData = jsonData.filter(item => item[filter[0]].includes(filter[1]));
     populateTable(filteredData);
 }
-
-$( "#progressbar" ).progressbar({
-    value: false
-});
