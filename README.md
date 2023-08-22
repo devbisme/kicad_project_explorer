@@ -8,7 +8,7 @@ This project consists of two sections:
 
 ## Usage
 
-You can explore the table of KiCad projects [here]().
+You can explore the table of KiCad projects [here](https://devbisme.github.io/kicad_project_explorer/).
 If you want to run it locally, do this:
 1. Clone this repository to your machine;
 2. Go into the `docs` directory.

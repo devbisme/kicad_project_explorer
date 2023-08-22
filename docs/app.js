@@ -3,7 +3,7 @@ let sortDirection = {};
 
 window.onload = function () {
     // Load the rows of KiCad Github project data from the JSON file.
-    fetch('/kicad_repos.json')
+    fetch('https://devbisme.github.io/kicad_project_explorer/kicad_repos.json')
         .then(response => response.json())
         .then(data => {
             preprocessData(data);
