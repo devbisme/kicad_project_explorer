@@ -2,51 +2,48 @@ let jsonData = [];
 let sortDirection = {};
 
 window.onload = function () {
-    // fetch('https://example.com/data.json')
-    // fetch('/kicad_repos_small.json')
+    // Load the rows of KiCad Github project data from the JSON file.
     fetch('/kicad_repos.json')
         .then(response => response.json())
         .then(data => {
             preprocessData(data);
             jsonData = data;
-            sortTableDesc("created"); // Start off with projects sorted by creation date, newest at top.
+            sortTableDesc(jsonData, "created"); // Start off with projects sorted by creation date, newest at top.
         });
 }
 
+// Preprocess the rows of data.
 function preprocessData(data) {
-    columns = Object.keys(data[0])
-    data.forEach((object, idx) => {
+    columns = Object.keys(data[0]);
+    data.forEach((row, idx) => {
         columns.forEach(column => {
 
             // Change empty data into an empty string.
-            if( object[column] === null ){
-                object[column] = "";
+            if( row[column] === null ){
+                row[column] = "";
             }
 
             switch (column) {
 
                 case 'name':
-                    object[column] = `<a href="${object["url"]}" target="_blank">${object[column]}</a>`;
+                    // Add hyperlink to project name.
+                    row[column] = `<a href="${row["url"]}" target="_blank">${row[column]}</a>`;
                     break;
 
-                // case 'description':
-                //     object[column] = object[column].toLowerCase();
-                //     break
-
                 case 'owner':
-                    object[column] = object[column].toLowerCase();
+                    row[column] = row[column].toLowerCase();
                     break;
             
                 case 'created':
                     // Split off the time; only keep the Y/M/D.
-                    date = object[column];
-                    object[column] = date.split("T")[0];
+                    date = row[column];
+                    row[column] = date.split("T")[0];
                     break;
 
                 case 'updated':
                     // Split off the time; only keep the Y/M/D.
-                    date = object[column];
-                    object[column] = date.split("T")[0];
+                    date = row[column];
+                    row[column] = date.split("T")[0];
                     break;
 
                 default:
@@ -55,9 +52,9 @@ function preprocessData(data) {
         })
 
         // Remove this data so it isn't displayed.
-        delete object.url;
-        delete object.id;
-        delete object.updated;
+        delete row.url;
+        delete row.id;
+        delete row.updated;
     })
 }
 
@@ -113,10 +110,10 @@ function populateTable(data) {
             // Create a row of data.
             let tr = document.createElement('tr');
             tr.className = idx % 2 === 0 ? 'even-row' : 'odd-row';
-            object = data[idx++]; // Get data and inc index to next row.
+            row = data[idx++]; // Get data and inc index to next row.
             columns.forEach(column => {
                 let td = document.createElement('td');
-                td.innerHTML = object[column];
+                td.innerHTML = row[column];
                 td.classList.add(column);
                 tr.appendChild(td);
             });
@@ -145,52 +142,114 @@ function populateTable(data) {
     dataRows();
 }
 
+// Update the progress bar with the progress value between 0..100.
 function updateProgressBar(progress) {
     bar = $("#progressbar");
     if (progress < 100) {
+        // Show the progress bar if the progress is less than 100.
+        // This also shows an indeterminate progress bar if progress is Boolean false.
         bar.show();
         bar.progressbar("option", "value", progress);
     }
     else {
+        // Hide progress bar once progress reaches or exceeds 100.
         bar.hide();
     }
 }
 
+// Create an indeterminate progress bar upon page load.
 $("#progressbar").progressbar({
     value: false
 });
 
-function sortTable(column) {
-    if (sortDirection[column] === 'asc')
-        sortTableAsc(column);
-    else
-        sortTableDesc(column);
-}
-
-function sortTableAsc(column) {
-    let sortedData = [...jsonData];
-    sortedData.sort((a, b) => (a[column] > b[column]) ? 1 : -1);
-    sortDirection[column] = 'desc';
-    populateTable(sortedData);
-}
-
-function sortTableDesc(column) {
-    let sortedData = [...jsonData];
-    sortedData.sort((a, b) => (a[column] < b[column]) ? 1 : -1);
-    sortDirection[column] = 'asc';
-    populateTable(sortedData);
-}
+let filteredData = null;
+let filterInput = document.getElementById('filterField');
 
 function filterTable() {
-    let filter = document.getElementById('filterField').value.split(":");
-    let filteredData = jsonData.filter(item => item[filter[0]].includes(filter[1]));
-    populateTable(filteredData);
+    filterStr = filterInput.value.trim();
+
+    if( filterStr === null || filterStr === undefined || filterStr.length === 0 ){
+        // Blank filter string so restore all project data.
+        clearFilter();
+        return;
+    }
+
+    // Check filter string syntax.
+    if( ! /^\w+:(\w+\s*)+$/.test(filterStr) ){
+        alert(`Malformed filter: ${filterStr}`);
+        return;
+    }
+
+    // Get the column to search in for a space-delimited list of values.
+    [col, vals] = filterStr.split(":", 2);
+    // Search for a column whose label starts with the given column name.
+    foundCol = null;
+    for( let column of Object.keys(jsonData[0]) ){
+        if( column.startsWith(col) ){
+            // Found one.
+            foundCol = column;
+            break;
+        }
+    }
+    if( foundCol === null ){
+        alert(`No column matches ${col}.`);
+        return;
+    }
+
+    // Search for rows containing all the search values.
+    filteredData = [...jsonData]; // Start with all the data rows.
+    for( val of vals.split(" ") ){
+        // Retain only the remaining rows that match the current value in the array of values.
+        filteredData = filteredData.filter(row => row[foundCol].toLowerCase().includes(val.toLowerCase()));
+    }
+
+    // Show the rows (if any) that have all the search values.
+    if( filteredData.length != 0 ){
+        populateTable(filteredData);
+    }
+
+    // Report the number of data rows found.
+    alert(`${filteredData.length} projects found.`);
 }
 
-let filterInput = document.getElementById('filterField');
+// Initiate filtering if return/enter key is pressed.
 filterInput.addEventListener("keypress", function(event) {
     if( event.key === "Enter"){
         event.preventDefault();
         document.getElementById("filterButton").click();
     }
 });
+
+// Clear the filter field and show all rows of the project data.
+function clearFilter() {
+    filterInput.placeholder = "Column:Value";
+    filterInput.value = "";
+    filteredData = null;
+    sortTableDesc(jsonData, "created"); // Replace filter with *ALL* projects sorted by creation date, newest at top.
+}
+
+// Sort the table based on the contents of a column and its sorting button state.
+function sortTable(column) {
+    // If the data has been filtered, then sort that. Otherwise, sort all the data.
+    sortData = (filteredData === null) ? jsonData : filteredData;
+    if (sortDirection[column] === 'asc')
+        sortTableAsc(sortData, column);
+    else
+        sortTableDesc(sortData, column);
+}
+
+// Sort data into ascending values as it goes downward in the table.
+function sortTableAsc(data, column) {
+    let sortedData = [...data];
+    sortedData.sort((a, b) => (a[column] > b[column]) ? 1 : -1);
+    sortDirection[column] = 'desc';
+    populateTable(sortedData);
+}
+
+// Sort data into descending values as it goes downward in the table.
+function sortTableDesc(data, column) {
+    let sortedData = [...data];
+    sortedData.sort((a, b) => (a[column] < b[column]) ? 1 : -1);
+    sortDirection[column] = 'asc';
+    populateTable(sortedData);
+}
