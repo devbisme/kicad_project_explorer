@@ -17,12 +17,26 @@ function preprocessData(data) {
     columns = Object.keys(data[0])
     data.forEach((object, idx) => {
         columns.forEach(column => {
+
+            // Change empty data into an empty string.
+            if( object[column] === null ){
+                object[column] = "";
+            }
+
             switch (column) {
 
                 case 'name':
                     object[column] = `<a href="${object["url"]}" target="_blank">${object[column]}</a>`;
                     break;
 
+                // case 'description':
+                //     object[column] = object[column].toLowerCase();
+                //     break
+
+                case 'owner':
+                    object[column] = object[column].toLowerCase();
+                    break;
+            
                 case 'created':
                     // Split off the time; only keep the Y/M/D.
                     date = object[column];
@@ -74,7 +88,7 @@ function populateTable(data) {
         if (!['name', 'description'].includes(column)) {
             let div_updwn = document.createElement('div');
             div_updwn.className = "sort-button";
-            div_updwn.innerHTML = '&nbsp;' + (sortDirection[column] === 'asc' ? '&#9650;' : '&#9660;');
+            div_updwn.innerHTML = '&nbsp;' + (sortDirection[column] === 'asc' ? '&#9660;' : '&#9650;');
             div_updwn.onclick = function () { sortTable(column); }
             th.appendChild(div_updwn);
         }
@@ -156,12 +170,14 @@ function sortTable(column) {
 function sortTableAsc(column) {
     let sortedData = [...jsonData];
     sortedData.sort((a, b) => (a[column] > b[column]) ? 1 : -1);
+    sortDirection[column] = 'desc';
     populateTable(sortedData);
 }
 
 function sortTableDesc(column) {
     let sortedData = [...jsonData];
     sortedData.sort((a, b) => (a[column] < b[column]) ? 1 : -1);
+    sortDirection[column] = 'asc';
     populateTable(sortedData);
 }
 
@@ -170,3 +186,11 @@ function filterTable() {
     let filteredData = jsonData.filter(item => item[filter[0]].includes(filter[1]));
     populateTable(filteredData);
 }
+
+let filterInput = document.getElementById('filterField');
+filterInput.addEventListener("keypress", function(event) {
+    if( event.key === "Enter"){
+        event.preventDefault();
+        document.getElementById("filterButton").click();
+    }
+});

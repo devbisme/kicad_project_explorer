@@ -7,8 +7,10 @@
 </head>
 <body>
     <h2>KiCad Project Explorer &nbsp;&nbsp; <div id="progressbar"></div></h2>
-    <input type="text" id="filterField" placeholder="Column:Value">
-    <button onclick="filterTable()">Filter</button>
+    <div id="filterDiv">
+        <input type="text" id="filterField" placeholder="Column:Value">
+        <button id="filterButton", onclick="filterTable()">Filter</button>
+    </div>
     <div class="table-container">
         <table id="dataTable">
             <thead></thead>

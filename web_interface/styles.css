@@ -77,6 +77,10 @@ th {
     display: inline-block;
 }
 
+#filterDiv {
+    display: inline-block;
+}
+
 .odd-row {
     background-color: #f2f2f2;
 }
