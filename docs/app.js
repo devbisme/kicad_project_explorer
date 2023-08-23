@@ -25,7 +25,7 @@ function preprocessData(data) {
 
             switch (column) {
 
-                case 'name':
+                case 'project':
                     // Add hyperlink to project name.
                     row[column] = `<a href="${row["url"]}" target="_blank">${row[column]}</a>`;
                     break;
@@ -40,12 +40,6 @@ function preprocessData(data) {
                     row[column] = date.split("T")[0];
                     break;
 
-                case 'updated':
-                    // Split off the time; only keep the Y/M/D.
-                    date = row[column];
-                    row[column] = date.split("T")[0];
-                    break;
-
                 default:
                     break;
             }
@@ -54,7 +48,6 @@ function preprocessData(data) {
         // Remove this data so it isn't displayed.
         delete row.url;
         delete row.id;
-        delete row.updated;
     })
 }
 
@@ -82,7 +75,7 @@ function populateTable(data) {
         th.appendChild(div_column);
 
         // Add sorting buttons to every column except the project name and description.
-        if (!['name', 'description'].includes(column)) {
+        if (!['project', 'description'].includes(column)) {
             let div_updwn = document.createElement('div');
             div_updwn.className = "sort-button";
             div_updwn.innerHTML = '&nbsp;' + (sortDirection[column] === 'asc' ? '&#9660;' : '&#9650;');

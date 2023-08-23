@@ -26,7 +26,7 @@ tmpfile=$(mktemp)
 page_size=100
 
 # Search for repos year-by-year.
-for y in {2012..2023}
+for y in {2008..2023}
 do
 
     # Search for repos in each month of the year. This keeps #repos < 1000 (Github search API limit). 
@@ -56,14 +56,13 @@ do
                     [ \
                         .items[] | \
                         { \
-                            name, \
+                            project:.name, \
                             description, \
                             owner:.owner.login, \
-                            size, \
                             stars:.stargazers_count, \
                             forks:.forks_count, \
+                            size, \
                             created:.created_at, \
-                            updated:.updated_at, \
                             url:.html_url, \
                             id \
                         } \
